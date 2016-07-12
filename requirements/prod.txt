@@ -1,0 +1,2 @@
+typing==3.5.2.2
+PyFunctional==0.7.1
