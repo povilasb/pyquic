@@ -7,9 +7,13 @@ pytest := $(virtualenv_dir)/bin/py.test
 coverage := $(virtualenv_dir)/bin/coverage
 
 
-test: $(virtualenv_dir)
+test:
+	test_type=unit $(MAKE) test-base
+	test_type=integration $(MAKE) test-base
+
+test-base: $(virtualenv_dir)
 	PYTHONPATH=$(PYTHONPATH):. $(coverage) run \
-		--source $(src_dir) $(pytest) -s tests
+		--source $(src_dir) $(pytest) -s tests/$(test_type)
 	$(coverage) report -m
 .PHONY: test
 
