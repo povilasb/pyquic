@@ -29,8 +29,7 @@ def tag_value_at(start_end: Tuple[int, int], data: bytes) -> bytes:
 
 def int32_little_endian(position: int, data: bytes) -> int:
     """Decodes little endian encoded 32 bit integer."""
-    return (data[position + 3] << 24) | (data[position + 2] << 16) | \
-        (data[position + 1] << 8) | data[position]
+    return int.from_bytes(data[position:position + 4], 'little')
 
 
 def tag_positions(tag_count: int):
