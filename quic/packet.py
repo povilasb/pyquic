@@ -59,3 +59,18 @@ def parse_public_header(data: bytes) -> PublicHeader:
     header.packet_number = parse_packet_number(
         data, 13, header.packet_number_length)
     return header
+
+
+def parse_packet_hash(data: bytes, offset: int) -> int:
+    """Extracts packet hash from the specified data buffer.
+
+    QUIC packet hash is 12 bytes long little endian encoded integer number.
+
+    Args:
+        data: packet buffer.
+        offset: hash offset in packet buffer.
+
+    Returns:
+        Extracted hash integer.
+    """
+    return int.from_bytes(data[offset:offset + 12], 'little')

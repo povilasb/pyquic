@@ -4,7 +4,7 @@ import pytest
 from quic.packet import PublicHeader, PUBLIC_FLAG_VERSION, \
     PUBLIC_FLAG_PACKET_NUMBER_1_BYTE, PUBLIC_FLAG_PACKET_NUMBER_2_BYTE, \
     PUBLIC_FLAG_PACKET_NUMBER_4_BYTE, PUBLIC_FLAG_PACKET_NUMBER_6_BYTE, \
-    parse_public_header
+    parse_public_header, parse_packet_hash
 
 
 def describe_public_header():
@@ -78,3 +78,12 @@ def describe_parse_public_header():
             header = parse_public_header(data)
 
             assert_that(header.packet_number, is_(0x1234))
+
+def describe_parse_packet_hash():
+    def it_extracts_12_byte_hash_in_little_endian_encoding():
+        data = b'....\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01....'
+        offset = 4
+
+        packet_hash = parse_packet_hash(data, offset)
+
+        assert_that(packet_hash, is_(0x010203040506070809101112))
