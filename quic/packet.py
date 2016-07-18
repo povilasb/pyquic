@@ -46,8 +46,7 @@ class PublicHeader:
 def parse_packet_number(data: bytes, offset: int,
         packet_number_length: int) -> int:
     """Parses packet number starting from the given offset."""
-    return reduce(lambda nr, byte: (nr << 8) | byte,
-        reversed(data[offset:offset + packet_number_length]), 0)
+    return int.from_bytes(data[offset:offset + packet_number_length], 'little')
 
 
 def parse_public_header(data: bytes) -> PublicHeader:
