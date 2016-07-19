@@ -43,33 +43,49 @@ class PublicHeader:
         return length
 
 
-def parse_packet_number(data: bytes, offset: int,
-        packet_number_length: int) -> int:
-    """Parses packet number starting from the given offset."""
-    return int.from_bytes(data[offset:offset + packet_number_length], 'little')
+class Parser:
+    """QUIC packet parser."""
 
+    def __init__(self, data: bytes) -> None:
+        """
+        Args:
+            data: UDP datagram.
+        """
+        self.data = data
+        self.data_offset = 0
 
-def parse_public_header(data: bytes) -> PublicHeader:
-    """Parses public header from UDP datagram payload."""
-    header = PublicHeader()
-    header.public_flags = data[0]
-    header.connection_id = data[1:9]
-    header.protocol_version = data[9:13]
-    header.packet_number = parse_packet_number(
-        data, 13, header.packet_number_length)
-    return header
+    def parse_public_header(self) -> PublicHeader:
+        """Advances data offset pointer.
 
+        Restarts data offset to 0 and advances it to point just after the
+        public header.
+        """
+        header = PublicHeader()
+        header.public_flags = self.data[0]
+        header.connection_id = self.data[1:9]
+        header.protocol_version = self.data[9:13]
+        header.packet_number = self._parse_packet_number(
+            13, header.packet_number_length)
 
-def parse_packet_hash(data: bytes, offset: int) -> int:
-    """Extracts packet hash from the specified data buffer.
+        self.data_offset = 13 + header.packet_number_length
 
-    QUIC packet hash is 12 bytes long little endian encoded integer number.
+        return header
 
-    Args:
-        data: packet buffer.
-        offset: hash offset in packet buffer.
+    def parse_packet_hash(self) -> int:
+        """Extracts packet hash starting from the current data buffer offset.
 
-    Returns:
-        Extracted hash integer.
-    """
-    return int.from_bytes(data[offset:offset + 12], 'little')
+        QUIC packet hash is 12 bytes long little endian encoded integer number.
+
+        Returns:
+            Extracted hash integer.
+        """
+        return int.from_bytes(
+            self.data[self.data_offset:self.data_offset + 12], 'little')
+
+    def _parse_packet_number(self, data_offset:int,
+            packet_number_length: int) -> int:
+        """Parses packet number starting from the current data offset."""
+        return int.from_bytes(
+            self.data[data_offset:data_offset + packet_number_length],
+            'little'
+        )
