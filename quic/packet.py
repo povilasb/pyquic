@@ -79,6 +79,8 @@ class Parser:
         Returns:
             Extracted hash integer.
         """
+        self.packet_hash_offset = self.data_offset
+
         return int.from_bytes(
             self.data[self.data_offset:self.data_offset + 12], 'little')
 

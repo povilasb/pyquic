@@ -66,3 +66,8 @@ def describe_parser():
                 packet_hash = parser.parse_packet_hash()
 
                 assert_that(packet_hash, is_(0x010203040506070809101112))
+
+            def it_sets_packet_hash_location():
+                parser.parse_packet_hash()
+
+                assert_that(parser.packet_hash_offset, is_(14))
