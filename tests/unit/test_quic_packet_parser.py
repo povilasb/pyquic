@@ -1,4 +1,5 @@
 from hamcrest import assert_that, is_
+import pytest
 
 from quic.packet import Parser
 
@@ -57,17 +58,20 @@ def describe_parser():
 
     def describe_parse_packet_hash():
         def describe_when_public_header_is_parsed():
-            data = b'\x08\x01\x02\x03\x04\x05\x06\x07\x08Q025' \
-                b'\x01\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01....'
-            parser = Parser(data)
-            parser.parse_public_header()
+            @pytest.fixture
+            def parser():
+                data = b'\x08\x01\x02\x03\x04\x05\x06\x07\x08Q025' \
+                    b'\x01\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01....'
+                parser = Parser(data)
+                parser.parse_public_header()
+                return parser
 
-            def it_extracts_12_byte_hash_in_little_endian_encoding():
+            def it_extracts_12_byte_hash_in_little_endian_encoding(parser):
                 packet_hash = parser.parse_packet_hash()
 
                 assert_that(packet_hash, is_(0x010203040506070809101112))
 
-            def it_sets_packet_hash_location():
+            def it_sets_packet_hash_location(parser):
                 parser.parse_packet_hash()
 
                 assert_that(parser.packet_hash_offset, is_(14))
