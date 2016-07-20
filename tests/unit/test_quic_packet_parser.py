@@ -1,7 +1,7 @@
-from hamcrest import assert_that, is_
+from hamcrest import assert_that, is_, calling, raises
 import pytest
 
-from quic.packet import Parser
+from quic.packet import Parser, PacketHashNotFound, bytes_excluded
 
 
 def describe_parser():
@@ -75,3 +75,21 @@ def describe_parser():
                 parser.parse_packet_hash()
 
                 assert_that(parser.packet_hash_offset, is_(14))
+
+    def describe_calc_packet_hash():
+        def describe_when_hash_offset_is_not_set():
+            def it_raises_an_exception():
+                parser = Parser(b'')
+
+                assert_that(
+                    calling(parser.calc_packet_hash),
+                    raises(PacketHashNotFound)
+                )
+
+def describe_bytes_excluded():
+    def it_returns_new_bytes_without_the_specified_region():
+        data = b'0123456789'
+
+        without_456 = bytes_excluded(data, 4, 3)
+
+        assert_that(without_456, is_(b'0123789'))
