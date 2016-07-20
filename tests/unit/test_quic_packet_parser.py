@@ -76,6 +76,11 @@ def describe_parser():
 
                 assert_that(parser.packet_hash_offset, is_(14))
 
+            def it_advances_data_offset_to_point_after_hash(parser):
+                parser.parse_packet_hash()
+
+                assert_that(parser.data_offset, is_(26))
+
     def describe_calc_packet_hash():
         def describe_when_hash_offset_is_not_set():
             def it_raises_an_exception():

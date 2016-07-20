@@ -90,9 +90,12 @@ class Parser:
             Extracted hash integer.
         """
         self.packet_hash_offset = self.data_offset
+        self.data_offset += PACKET_HASH_SIZE
 
         return int.from_bytes(
-            self.data[self.data_offset:self.data_offset + 12], 'little')
+            self.data[self.packet_hash_offset:self.packet_hash_offset + 12],
+            'little'
+        )
 
     def calc_packet_hash(self) -> int:
         """Calculates packet hash.
