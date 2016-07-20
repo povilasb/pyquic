@@ -93,7 +93,8 @@ class Parser:
         self.data_offset += PACKET_HASH_SIZE
 
         return int.from_bytes(
-            self.data[self.packet_hash_offset:self.packet_hash_offset + 12],
+            self.data[self.packet_hash_offset:
+                self.packet_hash_offset + PACKET_HASH_SIZE],
             'little'
         )
 
