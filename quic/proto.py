@@ -17,9 +17,7 @@ class HandshakeMessage:
 
 def tag_at(position: int, data: bytes) -> str:
     """Extracts tag at a given position."""
-    tag = chr(data[position]) + chr(data[position + 1]) + \
-        chr(data[position + 2]) + chr(data[position + 3])
-    return tag.strip(chr(0))
+    return str(data[position:position + 4], 'ascii').strip('\x00')
 
 
 def tag_value_at(start_end: Tuple[int, int], data: bytes) -> bytes:
