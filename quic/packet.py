@@ -57,6 +57,7 @@ class StreamFrameHeader:
     id_length = 0
 
 
+# TODO: check if I could use standard exception for this.
 class PacketHashNotFound(Exception):
     pass
 
