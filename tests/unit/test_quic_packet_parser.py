@@ -1,7 +1,8 @@
 from hamcrest import assert_that, is_, calling, raises
 import pytest
 
-from quic.packet import Parser, PacketHashNotFound, bytes_excluded
+from quic.packet import Parser, PacketHashNotFound, bytes_excluded, \
+    frame_type
 
 
 def describe_parser():
@@ -81,6 +82,36 @@ def describe_parser():
 
                 assert_that(parser.data_offset, is_(26))
 
+    def describe_parse_stream_frame_header():
+        def describe_when_packet_hash_is_parsed():
+            @pytest.fixture
+            def parser():
+                data = b'\x08\x01\x02\x03\x04\x05\x06\x07\x08Q025' \
+                    b'\x01\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01' \
+                    b'\xa5\x02\x01..'
+                parser = Parser(data)
+                parser.parse_public_header()
+                parser.parse_packet_hash()
+                return parser
+
+            def it_parses_frame_type_byte(parser):
+                header = parser.parse_stream_frame_header()
+
+                assert_that(header.finish, is_(False))
+                assert_that(header.has_data_length, is_(True))
+                assert_that(header.offset_length, is_(2))
+                assert_that(header.id_length, is_(2))
+
+            def it_parses_stream_id(parser):
+                header = parser.parse_stream_frame_header()
+
+                assert_that(header.id, is_(0x0102))
+
+            def it_advances_data_offset_to_point_to_byte_after_stream_frame_header(parser):
+                parser.parse_stream_frame_header()
+
+                assert_that(parser.data_offset, is_(31))
+
     def describe_calc_packet_hash():
         def describe_when_hash_offset_is_not_set():
             def it_raises_an_exception():
@@ -98,3 +129,7 @@ def describe_bytes_excluded():
         without_456 = bytes_excluded(data, 4, 3)
 
         assert_that(without_456, is_(b'0123789'))
+
+def describe_frame_type():
+    def it_returns_frame_type_from_first_byte_after_packet_hash():
+        assert_that(frame_type(0xa0), is_('STREAM'))

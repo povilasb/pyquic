@@ -48,6 +48,15 @@ class PublicHeader:
         return length
 
 
+class StreamFrameHeader:
+    id = 0
+    finish = False
+    has_data_length = False
+    data_length = 0
+    offset_length = 0
+    id_length = 0
+
+
 class PacketHashNotFound(Exception):
     pass
 
@@ -98,6 +107,28 @@ class Parser:
             'little'
         )
 
+    def parse_stream_frame_header(self) -> StreamFrameHeader:
+        header = StreamFrameHeader()
+
+        frame_type_byte = self.data[self.data_offset]
+        header.finish = bool(frame_type_byte & 0x40)
+        header.has_data_length = bool(frame_type_byte & 0x20)
+
+        header.offset_length = (frame_type_byte >> 2) & 7
+        if header.offset_length:
+            header.offset_length += 1
+
+        header.id_length = (frame_type_byte & 3) + 1
+        header.id = int.from_bytes(
+            self.data[self.data_offset + 1\
+                :self.data_offset + 1 + header.id_length],
+            'little'
+        )
+
+        self.data_offset += 1 + header.id_length + header.offset_length
+
+        return header
+
     def calc_packet_hash(self) -> int:
         """Calculates packet hash.
 
@@ -128,6 +159,12 @@ class Parser:
         if not self.packet_hash_offset:
             raise PacketHashNotFound('Packet hash offset was not set. ' \
                 'Be sure to parse packet hash before calling this function.')
+
+
+def frame_type(frame_type_byte: int) -> str:
+    """Identifies frame type from frame type byte."""
+    if frame_type_byte >> 7 == 1:
+        return 'STREAM'
 
 
 def bytes_excluded(data: bytes, start: int, length: int) -> bytes:
