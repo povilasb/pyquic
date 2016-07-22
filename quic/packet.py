@@ -17,6 +17,12 @@ PUBLIC_FLAG_PACKET_NUMBER_6_BYTE = 0x30
 
 PACKET_HASH_SIZE = 12 # bytes
 
+FRAME_FLAG_STREAM = 0x80
+FRAME_FLAG_STREAM_FINISHED = 0x40
+FRAME_FLAG_STREAM_DATA_LENGTH_PRESENT = 0x20
+FRAME_FLAG_STREAM_DATA_OFFSET_LENGTH = 0x1C
+FRAME_FLAG_STREAM_ID_LENGTH = 0x03
+
 
 class PublicHeader:
     """Public QUIC packet header."""
@@ -64,6 +70,32 @@ class StreamFrameHeader:
     offset_length = 0
     id_length = 0
 
+    def to_bytes(self) -> bytes:
+        """Serializes stream frame header to byte array."""
+        buff = self._serialized_type_byte() \
+            + self.id.to_bytes(self.id_length, byteorder='little') \
+
+        if self.has_data_length:
+            buff += self.data_length.to_bytes(2, byteorder='little')
+
+        return buff
+
+    def _serialized_type_byte(self) -> bytes:
+        """Serializes the stream frame type byte."""
+        flags = FRAME_FLAG_STREAM
+
+        if self.finish:
+            flags |= FRAME_FLAG_STREAM_FINISHED
+
+        if self.has_data_length:
+            flags |= FRAME_FLAG_STREAM_DATA_LENGTH_PRESENT
+
+        if self.offset_length:
+            flags |= (self.offset_length << 2) & FRAME_FLAG_STREAM_DATA_OFFSET_LENGTH
+
+        flags |= (self.id_length - 1) & FRAME_FLAG_STREAM_ID_LENGTH
+
+        return flags.to_bytes(1, byteorder='little')
 
 
 class Parser:
