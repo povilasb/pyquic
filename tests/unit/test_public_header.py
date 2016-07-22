@@ -3,7 +3,8 @@ import pytest
 
 from quic.packet import PublicHeader, PUBLIC_FLAG_VERSION, \
     PUBLIC_FLAG_PACKET_NUMBER_1_BYTE, PUBLIC_FLAG_PACKET_NUMBER_2_BYTE, \
-    PUBLIC_FLAG_PACKET_NUMBER_4_BYTE, PUBLIC_FLAG_PACKET_NUMBER_6_BYTE
+    PUBLIC_FLAG_PACKET_NUMBER_4_BYTE, PUBLIC_FLAG_PACKET_NUMBER_6_BYTE, \
+    PUBLIC_FLAG_CONNECTION_ID_8_BYTES, PUBLIC_FLAG_DIVERSIFICATION_NONCE
 
 
 def describe_public_header():
@@ -39,3 +40,19 @@ def describe_public_header():
             header.public_flags = flags
 
             assert_that(header.packet_number_length, is_(expected_length))
+
+    def describe_to_bytes():
+        def it_returns_public_header_serialized_to_bytes_array():
+            header = PublicHeader()
+            header.public_flags = PUBLIC_FLAG_VERSION \
+                | PUBLIC_FLAG_CONNECTION_ID_8_BYTES \
+                | PUBLIC_FLAG_DIVERSIFICATION_NONCE \
+                | PUBLIC_FLAG_PACKET_NUMBER_1_BYTE
+            header.connection_id = 0x0102030405060708
+            header.protocol_version = b'Q034'
+            header.packet_number = 1
+
+            serialized = header.to_bytes()
+
+            assert_that(serialized,
+                is_(b'\x0d\x08\x07\x06\x05\x04\x03\x02\x01Q034\x01'))

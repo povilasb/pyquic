@@ -47,6 +47,14 @@ class PublicHeader:
             return 1
         return length
 
+    def to_bytes(self) -> bytes:
+        """Serializes public header to bytes array."""
+        return self.public_flags.to_bytes(1, byteorder='little') \
+            + self.connection_id.to_bytes(8, byteorder='little') \
+            + self.protocol_version \
+            + self.packet_number.to_bytes(1, byteorder='little')
+        # TODO: get the actual packet number field length
+
 
 class StreamFrameHeader:
     id = 0
