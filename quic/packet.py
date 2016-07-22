@@ -65,10 +65,6 @@ class StreamFrameHeader:
     id_length = 0
 
 
-# TODO: check if I could use standard exception for this.
-class PacketHashNotFound(Exception):
-    pass
-
 
 class Parser:
     """QUIC packet parser."""
@@ -166,7 +162,7 @@ class Parser:
             PacketHashNotFound: if packet hash offset is not set.
         """
         if not self.packet_hash_offset:
-            raise PacketHashNotFound('Packet hash offset was not set. ' \
+            raise IndexError('Packet hash offset was not set. ' \
                 'Be sure to parse packet hash before calling this function.')
 
 

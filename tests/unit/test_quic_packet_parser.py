@@ -1,8 +1,7 @@
 from hamcrest import assert_that, is_, calling, raises
 import pytest
 
-from quic.packet import Parser, PacketHashNotFound, bytes_excluded, \
-    frame_type
+from quic.packet import Parser, bytes_excluded, frame_type
 
 
 def describe_parser():
@@ -119,7 +118,7 @@ def describe_parser():
 
                 assert_that(
                     calling(parser.calc_packet_hash),
-                    raises(PacketHashNotFound)
+                    raises(IndexError)
                 )
 
 def describe_bytes_excluded():
