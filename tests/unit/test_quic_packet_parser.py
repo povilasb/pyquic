@@ -87,7 +87,7 @@ def describe_parser():
             def parser():
                 data = b'\x08\x01\x02\x03\x04\x05\x06\x07\x08Q025' \
                     b'\x01\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01' \
-                    b'\xa5\x02\x01..'
+                    b'\xa5\x02\x01..\x14\x05...'
                 parser = Parser(data)
                 parser.parse_public_header()
                 parser.parse_packet_hash()
@@ -106,10 +106,15 @@ def describe_parser():
 
                 assert_that(header.id, is_(0x0102))
 
+            def it_parses_data_length(parser):
+                header = parser.parse_stream_frame_header()
+
+                assert_that(header.data_length, is_(1300))
+
             def it_advances_data_offset_to_point_to_byte_after_stream_frame_header(parser):
                 parser.parse_stream_frame_header()
 
-                assert_that(parser.data_offset, is_(31))
+                assert_that(parser.data_offset, is_(33))
 
     def describe_calc_packet_hash():
         def describe_when_hash_offset_is_not_set():

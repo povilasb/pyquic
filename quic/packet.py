@@ -132,6 +132,13 @@ class Parser:
 
         self.data_offset += 1 + header.id_length + header.offset_length
 
+        if header.has_data_length:
+            header.data_length = int.from_bytes(
+                self.data[self.data_offset:self.data_offset + 2],
+                'little'
+            )
+            self.data_offset += 2
+
         return header
 
     def calc_packet_hash(self) -> int:
