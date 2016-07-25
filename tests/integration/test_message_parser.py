@@ -1,6 +1,6 @@
 from hamcrest import assert_that, is_, has_entries
 
-from quic.proto import read_packet, decode_handshake_message
+from quic.handshake import read_packet, decode_handshake_message
 
 
 def fixture_packet(fixture_name):

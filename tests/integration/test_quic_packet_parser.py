@@ -1,7 +1,7 @@
 from hamcrest import assert_that, is_, has_entries
 
 from quic.packet import Parser
-from quic.proto import read_packet
+from quic.handshake import read_packet
 
 
 def fixture_packet(fixture_name):

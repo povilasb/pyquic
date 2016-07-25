@@ -1,4 +1,4 @@
-"""QUIC protocol implementation."""
+"""QUIC handshake message utilities."""
 
 import collections
 from functools import partial

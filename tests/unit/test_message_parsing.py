@@ -1,6 +1,6 @@
 from hamcrest import assert_that, is_, has_length
 
-from quic.proto import tag_at, int32_little_endian, tag_positions
+from quic.handshake import tag_at, int32_little_endian, tag_positions
 
 
 def describe_tag_at():
