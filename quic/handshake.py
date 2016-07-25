@@ -8,7 +8,7 @@ from typing import Tuple
 from functional import seq
 
 
-class HandshakeMessage:
+class Message:
     """Crypto handshake message."""
     tag = None # type: bytes
     tag_count = 0
@@ -35,12 +35,12 @@ def tag_positions(tag_count: int):
     return seq(range(0, tag_count)).map(lambda tag_nr: 8 + tag_nr * 8)
 
 
-def decode_handshake_message(raw_data: bytes) -> HandshakeMessage:
+def decode_handshake_message(raw_data: bytes) -> Message:
     """
     Args:
         raw_data: QUIC message without public header.
     """
-    msg = HandshakeMessage()
+    msg = Message()
     msg.tag = raw_data[:4]
     msg.tag_count = (raw_data[5] << 8) | raw_data[4]
 
