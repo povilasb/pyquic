@@ -14,6 +14,30 @@ class Message:
     tag_count = 0
     tags = collections.OrderedDict() # type: collections.OrderedDict
 
+    def to_bytes(self) -> bytes:
+        """Serializes client handhsake message to bytes."""
+        return self.tag + self.tag_count.to_bytes(2, byteorder='little') \
+            + b'\x00\x00' + self._serialize_tags()
+
+    def _serialize_tags(self):
+        buff = b''
+        value_end_offset = 0
+
+        for tag, value in self.tags.items():
+            value_end_offset += len(value)
+            buff += serialize_tag(tag, value_end_offset)
+
+        return buff
+
+
+def serialize_tag(tag: str, value_end_offset: int) -> bytes:
+    """Serializes tag and it's value end offset.
+
+    If tag is less than 4 bytes, it's padded with 0x00 bytes.
+    """
+    return bytes(tag, 'ascii') + b'\x00' * (4 - len(tag)) \
+        + value_end_offset.to_bytes(4, byteorder='little')
+
 
 def tag_at(position: int, data: bytes) -> str:
     """Extracts tag at a given position."""
