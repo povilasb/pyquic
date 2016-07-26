@@ -11,8 +11,12 @@ from functional import seq
 class Message:
     """Crypto handshake message."""
     tag = None # type: bytes
-    tag_count = 0
     tags = collections.OrderedDict() # type: collections.OrderedDict
+
+
+    @property
+    def tag_count(self) -> int:
+        return len(self.tags)
 
     @property
     def values_offset(self) -> int:
@@ -78,13 +82,15 @@ def decode_handshake_message(raw_data: bytes) -> Message:
     """
     msg = Message()
     msg.tag = raw_data[:4]
-    msg.tag_count = (raw_data[5] << 8) | raw_data[4]
 
-    value_positions = seq(msg.values_offset) + tag_positions(msg.tag_count)\
+    tag_count = (raw_data[5] << 8) | raw_data[4]
+    values_offset = 8 + tag_count * 8
+
+    value_positions = seq(values_offset) + tag_positions(tag_count)\
         .map(lambda pos: int32_little_endian(pos + 4, raw_data))\
-        .map(partial(add, msg.values_offset))
+        .map(partial(add, values_offset))
 
-    msg.tags = tag_positions(msg.tag_count)\
+    msg.tags = tag_positions(tag_count)\
         .map(partial(tag_at, data=raw_data))\
         .zip(value_positions\
             .zip(value_positions.drop(1))\

@@ -7,7 +7,7 @@ def describe_handshake_message():
     def describe_values_offset():
         def it_returns_offset_in_serialized_message_where_tag_values_start():
             msg = handshake.Message()
-            msg.tag_count = 3
+            msg.tags = {'tag1': 'val1', 'tag2': 'val2', 'tag3': 'val3'}
 
             assert_that(msg.values_offset, is_(32))
 
@@ -23,7 +23,7 @@ def describe_handshake_message():
         def it_returns_bytes_array_which_includes_tag_count_with_padding():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tag_count = 0x01
+            msg.tags = {'tag1': 'val1'}
 
             buff = msg.to_bytes()
 
@@ -32,7 +32,6 @@ def describe_handshake_message():
         def it_returns_bytes_array_with_tag_names_and_data_offsets_placed_after_tag_count():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tag_count = 0x01
             msg.tags = {'SNI': 'www.example.com'}
 
             buff = msg.to_bytes()
@@ -43,7 +42,6 @@ def describe_handshake_message():
         def it_returns_bytes_array_with_tag_values_placed_after_tag_metainfo():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tag_count = 0x01
             msg.tags = {'SNI': 'www.example.com'}
 
             buff = msg.to_bytes()

@@ -39,7 +39,6 @@ def describe_decode_handhsake_message():
         msg = handshake.Message()
         msg.tag = b'CHLO'
         msg.tags = {'SNI': 'www.example.com', 'VER': 'Q034'}
-        msg.tag_count = 2
 
         deserialized_msg = decode_handshake_message(msg.to_bytes())
 
