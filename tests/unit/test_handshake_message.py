@@ -39,3 +39,13 @@ def describe_handshake_message():
 
             assert_that(buff[8:12], is_(b'SNI\x00'))
             assert_that(buff[12:16], is_(b'\x0f\x00\x00\x00'))
+
+        def it_returns_bytes_array_with_tag_values_placed_after_tag_metainfo():
+            msg = handshake.Message()
+            msg.tag = b'CHLO'
+            msg.tag_count = 0x01
+            msg.tags = {'SNI': 'www.example.com'}
+
+            buff = msg.to_bytes()
+
+            assert_that(buff[16:31], is_(b'www.example.com'))

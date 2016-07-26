@@ -1,7 +1,7 @@
 """QUIC handshake message utilities."""
 
 import collections
-from functools import partial
+from functools import partial, reduce
 from operator import add
 from typing import Tuple
 
@@ -25,7 +25,7 @@ class Message:
     def to_bytes(self) -> bytes:
         """Serializes client handhsake message to bytes."""
         return self.tag + self.tag_count.to_bytes(2, byteorder='little') \
-            + b'\x00\x00' + self._serialize_tags()
+            + b'\x00\x00' + self._serialize_tags() + self._serialize_tag_values()
 
     def _serialize_tags(self):
         buff = b''
@@ -36,6 +36,10 @@ class Message:
             buff += serialize_tag(tag, value_end_offset)
 
         return buff
+
+    def _serialize_tag_values(self):
+        return reduce(lambda buff, tag_value: buff + bytes(tag_value, 'ascii'),
+            self.tags.values(), b'')
 
 
 def serialize_tag(tag: str, value_end_offset: int) -> bytes:
