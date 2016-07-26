@@ -14,6 +14,14 @@ class Message:
     tag_count = 0
     tags = collections.OrderedDict() # type: collections.OrderedDict
 
+    @property
+    def values_offset(self) -> int:
+        """
+        Returns:
+            tag values offset in serialized message buffer.
+        """
+        return 8 + self.tag_count * 8
+
     def to_bytes(self) -> bytes:
         """Serializes client handhsake message to bytes."""
         return self.tag + self.tag_count.to_bytes(2, byteorder='little') \
@@ -68,10 +76,9 @@ def decode_handshake_message(raw_data: bytes) -> Message:
     msg.tag = raw_data[:4]
     msg.tag_count = (raw_data[5] << 8) | raw_data[4]
 
-    values_start_pos = 8 + msg.tag_count * 8
-    value_positions = seq(values_start_pos) + tag_positions(msg.tag_count)\
+    value_positions = seq(msg.values_offset) + tag_positions(msg.tag_count)\
         .map(lambda pos: int32_little_endian(pos + 4, raw_data))\
-        .map(partial(add, values_start_pos))
+        .map(partial(add, msg.values_offset))
 
     msg.tags = tag_positions(msg.tag_count)\
         .map(partial(tag_at, data=raw_data))\

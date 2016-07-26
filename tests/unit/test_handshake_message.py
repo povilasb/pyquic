@@ -4,6 +4,13 @@ import quic.handshake as handshake
 
 
 def describe_handshake_message():
+    def describe_values_offset():
+        def it_returns_offset_in_serialized_message_where_tag_values_start():
+            msg = handshake.Message()
+            msg.tag_count = 3
+
+            assert_that(msg.values_offset, is_(32))
+
     def describe_to_bytes():
         def it_returns_bytes_array_starting_with_message_tag():
             msg = handshake.Message()
