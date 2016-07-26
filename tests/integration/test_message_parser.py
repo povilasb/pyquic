@@ -1,5 +1,6 @@
 from hamcrest import assert_that, is_, has_entries
 
+import quic.handshake as handshake
 from quic.handshake import read_packet, decode_handshake_message
 
 
@@ -33,3 +34,17 @@ def describe_decode_handhsake_message():
             'SFCW': b'\x00\x40\x00\x00',
         }
         assert_that(msg.tags, has_entries(expected_tags))
+
+    def it_is_able_to_parse_message_serialized_with_to_bytes():
+        msg = handshake.Message()
+        msg.tag = b'CHLO'
+        msg.tags = {'SNI': 'www.example.com', 'VER': 'Q034'}
+        msg.tag_count = 2
+
+        deserialized_msg = decode_handshake_message(msg.to_bytes())
+
+        assert_that(deserialized_msg.tag, is_(b'CHLO'))
+        assert_that(
+            deserialized_msg.tags,
+            has_entries({'SNI': b'www.example.com', 'VER': b'Q034'})
+        )
