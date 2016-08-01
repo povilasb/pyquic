@@ -1,6 +1,7 @@
 from hamcrest import assert_that, is_
 
 import quic.handshake as handshake
+import quic.tags as tags
 
 
 def describe_handshake_message():
@@ -23,7 +24,7 @@ def describe_handshake_message():
         def it_returns_bytes_array_which_includes_tag_count_with_padding():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tags = {'tag1': 'val1'}
+            msg.tags = tags.Container({'tag1': 'val1'})
 
             buff = msg.to_bytes()
 
@@ -32,7 +33,7 @@ def describe_handshake_message():
         def it_returns_bytes_array_with_tag_names_and_data_offsets_placed_after_tag_count():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tags = {'SNI': 'www.example.com'}
+            msg.tags = tags.Container({'SNI': 'www.example.com'})
 
             buff = msg.to_bytes()
 
@@ -42,7 +43,7 @@ def describe_handshake_message():
         def it_returns_bytes_array_with_tag_values_placed_after_tag_metainfo():
             msg = handshake.Message()
             msg.tag = b'CHLO'
-            msg.tags = {'SNI': 'www.example.com'}
+            msg.tags = tags.Container({'SNI': 'www.example.com'})
 
             buff = msg.to_bytes()
 

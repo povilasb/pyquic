@@ -2,6 +2,7 @@ from hamcrest import assert_that, is_, has_entries
 
 import quic.handshake as handshake
 from quic.handshake import read_packet, decode_handshake_message
+import quic.tags as tags
 
 
 def fixture_packet(fixture_name):
@@ -38,7 +39,7 @@ def describe_decode_handhsake_message():
     def it_is_able_to_parse_message_serialized_with_to_bytes():
         msg = handshake.Message()
         msg.tag = b'CHLO'
-        msg.tags = {'SNI': 'www.example.com', 'VER': 'Q034'}
+        msg.tags = tags.Container({'SNI': 'www.example.com', 'VER': 'Q034'})
 
         deserialized_msg = decode_handshake_message(msg.to_bytes())
 
