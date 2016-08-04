@@ -28,6 +28,13 @@ class Container(dict):
         """
         return sorted(super().keys())
 
+    def values(self) -> List[int]:
+        """
+        Returns:
+            tag values sorted in ascending order by tag name.
+        """
+        return map(lambda key_val: key_val[1], self.items())
+
     def __setitem__(self, key: Union[str, int], value: str) -> None:
         super().__setitem__(_int_tag_name(key), value)
 

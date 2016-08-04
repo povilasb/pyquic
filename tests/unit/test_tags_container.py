@@ -45,6 +45,17 @@ def describe_tags_container():
 
             assert_that(stored_tags, is_([0x41, 0x50, 0x56]))
 
+    def describe_values():
+        def it_returns_values_in_ascending_order_by_tag_name():
+            msg_tags = tags.Container()
+            msg_tags['V'] = 'value1'
+            msg_tags['P'] = 'value3'
+            msg_tags['A'] = 'value2'
+
+            stored_tag_values = [t for t in msg_tags.values()]
+
+            assert_that(stored_tag_values, is_(['value2', 'value3', 'value1']))
+
     def describe_constructor():
         def describe_when_non_empty_dictionary_is_provided():
             def it_converts_dictionary_keys_into_ints_and_stores_the_values():
