@@ -42,16 +42,25 @@ class Message:
         return buff
 
     def _serialize_tag_values(self):
-        return reduce(lambda buff, tag_value: buff + bytes(tag_value, 'ascii'),
+        return reduce(lambda buff, tag_value: buff + serialize_tag_value(tag_value),
             self.tags.values(), b'')
 
 
-def serialize_tag(tag: str, value_end_offset: int) -> bytes:
+def serialize_tag_value(tag_val) -> bytes:
+    if type(tag_val) is str:
+        return bytes(tag_val, 'ascii')
+    elif type(tag_val) is bytes:
+        return tag_val
+
+    return None
+
+
+def serialize_tag(tag: int, value_end_offset: int) -> bytes:
     """Serializes tag and it's value end offset.
 
     If tag is less than 4 bytes, it's padded with 0x00 bytes.
     """
-    return bytes(tag, 'ascii') + b'\x00' * (4 - len(tag)) \
+    return tag.to_bytes(4, byteorder='little') \
         + value_end_offset.to_bytes(4, byteorder='little')
 
 
