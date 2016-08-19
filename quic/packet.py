@@ -33,7 +33,7 @@ class PublicHeader:
             | PUBLIC_FLAG_DIVERSIFICATION_NONCE \
             | PUBLIC_FLAG_PACKET_NUMBER_1_BYTE
         self.connection_id = b''
-        self.protocol_version = b'Q035'
+        self.protocol_version = b'Q034'
         self.diversification_nonces = []
         self.packet_number = 0
 
